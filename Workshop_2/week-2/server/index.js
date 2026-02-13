@@ -2,7 +2,6 @@ const express = require('express');
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const mongoose = require('mongoose');
-const path = require('path');
 const Course = require('./models/course');
 
 mongoose.connect('mongodb+srv://rquesada:admin123@cluster0.r4xmzby.mongodb.net/?appName=Cluster0');
