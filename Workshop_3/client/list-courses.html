@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>List Courses</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1000px;
+      margin: 50px auto;
+      padding: 20px;
+    }
+    nav {
+      margin-bottom: 20px;
+    }
+    nav a {
+      margin-right: 15px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+    }
+    th {
+      background-color: #4CAF50;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #loading {
+      text-align: center;
+      font-size: 18px;
+      color: #666;
+    }
+    #error {
+      background-color: #f8d7da;
+      color: #721c24;
+      padding: 10px;
+      margin-bottom: 20px;
+    }
+    .empty {
+      text-align: center;
+      padding: 20px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="create-course.html">Create Course</a>
+    <a href="list-courses.html">List Courses</a>
+  </nav>
+
+  <h1>All Courses</h1>
+  
+  <button onclick="loadCourses()">Refresh Courses</button>
+  
+  <div id="error" style="display: none;"></div>
+  <div id="loading" style="display: none;">Loading courses...</div>
+  <div id="coursesContainer"></div>
+
+  <script>
+    async function loadCourses() {
+      const loadingDiv = document.getElementById('loading');
+      const errorDiv = document.getElementById('error');
+      const container = document.getElementById('coursesContainer');
+      
+      loadingDiv.style.display = 'block';
+      errorDiv.style.display = 'none';
+      container.innerHTML = '';
+
+      try {
+        const response = await fetch('http://localhost:3001/courses');
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const courses = await response.json();
+        loadingDiv.style.display = 'none';
+        
+        if (courses.length === 0) {
+          container.innerHTML = '<div class="empty">No courses found. Create your first course!</div>';
+          return;
+        }
+
+        const table = document.createElement('table');
+        table.innerHTML = `
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Credits</th>
+
+            </tr>
+          </thead>
+          <tbody>
+            ${courses.map(course => `
+              <tr>
+                <td>${course.name}</td>
+                <td>${course.credits}</td>
+
+              </tr>
+            `).join('')}
+          </tbody>
+        `;
+        
+        container.appendChild(table);
+        
+      } catch (error) {
+        loadingDiv.style.display = 'none';
+        errorDiv.style.display = 'block';
+        errorDiv.innerHTML = `Error loading courses: ${error.message}`;
+      }
+    }
+
+    // Load courses when page loads
+    window.addEventListener('DOMContentLoaded', loadCourses);
+  </script>
+</body>
+</html>
