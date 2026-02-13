@@ -82,20 +82,12 @@
       <input type="text" id="name" name="name" required placeholder="e.g., Introduction to Programming">
     </div>
     
-    <div class="form-group">
-      <label for="code">Course Code:</label>
-      <input type="text" id="code" name="code" required placeholder="e.g., CS101">
-    </div>
     
     <div class="form-group">
       <label for="credits">Credits:</label>
       <input type="number" id="credits" name="credits" min="1" max="10" required placeholder="e.g., 3">
     </div>
     
-    <div class="form-group">
-      <label for="description">Description:</label>
-      <textarea id="description" name="description" rows="4" placeholder="Enter course description (optional)"></textarea>
-    </div>
     
     <button type="submit">Create Course</button>
   </form>
@@ -108,9 +100,7 @@
       
       const course = {
         name: document.getElementById('name').value,
-        code: document.getElementById('code').value,
-        credits: parseInt(document.getElementById('credits').value),
-        description: document.getElementById('description').value
+        credits: parseInt(document.getElementById('credits').value)
       };
 
       const messageDiv = document.getElementById('message');
@@ -131,7 +121,7 @@
           messageDiv.style.display = 'block';
           messageDiv.innerHTML = `✓ Course created successfully!<br>
                                   <strong>Name:</strong> ${data.name}<br>
-                                  <strong>Code:</strong> ${data.code}<br>
+                                
                                   <strong>Credits:</strong> ${data.credits}`;
           document.getElementById('courseForm').reset();
           

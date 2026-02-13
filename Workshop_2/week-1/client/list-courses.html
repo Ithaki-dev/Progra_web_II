@@ -108,21 +108,17 @@
         table.innerHTML = `
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Code</th>
               <th>Name</th>
               <th>Credits</th>
-              <th>Description</th>
+
             </tr>
           </thead>
           <tbody>
             ${courses.map(course => `
               <tr>
-                <td>${course.id || 'N/A'}</td>
-                <td>${course.code}</td>
                 <td>${course.name}</td>
                 <td>${course.credits}</td>
-                <td>${course.description || 'No description'}</td>
+
               </tr>
             `).join('')}
           </tbody>

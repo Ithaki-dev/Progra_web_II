@@ -102,8 +102,6 @@ app.put('/courses', async (req, res) => {
     }
 })
 
-// Servir archivos estáticos del cliente (DEBE ir al final, después de las rutas API)
-app.use(express.static(path.join(__dirname, '../../week-1/client')));
 
 //start the app
 app.listen(3001, () => console.log(`UTN API service listening on port 3001!`))
