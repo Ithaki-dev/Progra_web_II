@@ -3,52 +3,340 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Week 1 - Consume API</title>
-  <script>
-    const completed = (response) => {
-      const data = response.target.responseText;
-      document.getElementById('result').innerHTML = data;
-    };
-
-    const error = () => console.log(this.responseText);
-
-    function getExchange() {
-      const currency = document.getElementById('type').value;
-      const ajaxRequest = new XMLHttpRequest(); //AJAX
-      ajaxRequest.addEventListener("load", completed);
-      ajaxRequest.addEventListener("error", error);
-      ajaxRequest.open("GET", `http://localhost:3001/tipocambio?type=${currency}`);
-      ajaxRequest.send();
+  <title>UTN - Sistema de Gestión Académica</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
-    function getExchangeUsingFetch() {
-      const currency = document.getElementById('type').value;
-      fetch(`http://localhost:3001/tipocambio?type=${currency}`)
-        .then(response => response.json())
-        .then(data => {
-          document.getElementById('result').innerHTML = JSON.stringify(data);
-        })
-        .catch(error => console.log('Error:', error));
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: #333;
     }
-  </script>
+
+    /* Header y Navegación */
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 1rem 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    nav {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      text-decoration: none;
+      color: white;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      transition: opacity 0.3s;
+      font-weight: 500;
+    }
+
+    .nav-links a:hover {
+      opacity: 0.8;
+    }
+
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 6rem 20px;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      animation: fadeInDown 1s;
+    }
+
+    .hero p {
+      font-size: 1.3rem;
+      margin-bottom: 2rem;
+      opacity: 0.9;
+      animation: fadeInUp 1s;
+    }
+
+    /* Cards Container */
+    .container {
+      max-width: 1200px;
+      margin: -50px auto 50px;
+      padding: 0 20px;
+      position: relative;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+
+    .card {
+      background: white;
+      border-radius: 10px;
+      padding: 2rem;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+      transition: transform 0.3s, box-shadow 0.3s;
+      text-align: center;
+    }
+
+    .card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .card-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .card h2 {
+      color: #667eea;
+      margin-bottom: 1rem;
+      font-size: 1.5rem;
+    }
+
+    .card p {
+      color: #666;
+      margin-bottom: 1.5rem;
+    }
+
+    .card-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border-radius: 5px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s;
+      display: inline-block;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #5568d3;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: #667eea;
+      border: 2px solid #667eea;
+    }
+
+    .btn-secondary:hover {
+      background: #667eea;
+      color: white;
+    }
+
+    /* Features Section */
+    .features {
+      background: #f8f9fa;
+      padding: 4rem 20px;
+      text-align: center;
+    }
+
+    .features h2 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      color: #333;
+    }
+
+    .features p {
+      color: #666;
+      font-size: 1.1rem;
+      max-width: 600px;
+      margin: 0 auto 3rem;
+    }
+
+    .feature-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .feature-item {
+      padding: 1.5rem;
+    }
+
+    .feature-item h3 {
+      color: #667eea;
+      margin-bottom: 0.5rem;
+    }
+
+    /* Footer */
+    footer {
+      background: #333;
+      color: white;
+      text-align: center;
+      padding: 2rem 20px;
+    }
+
+    footer p {
+      margin-bottom: 0.5rem;
+    }
+
+    /* Animations */
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 2rem;
+      }
+
+      .hero p {
+        font-size: 1rem;
+      }
+
+      .nav-links {
+        gap: 1rem;
+      }
+
+      .cards {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
-
 <body>
-  <nav style="margin-bottom: 20px;">
-    <a href="index.html">Home</a>
-    <a href="create-course.html">Create Course</a>
-    <a href="list-courses.html">List Courses</a>
-  </nav>
+  <!-- Header -->
+  <header>
+    <nav>
+      <a href="index.html" class="logo">🎓 UTN</a>
+      <ul class="nav-links">
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="list-courses.html">Cursos</a></li>
+        <li><a href="list-profesores.html">Profesores</a></li>
+      </ul>
+    </nav>
+  </header>
 
-  <h2>Exchange Rate Converter</h2>
-  <select id="type">
-    <option value="all">All</option>
-    <option value="eur">Euro</option>
-    <option value="usd">US Dollar</option>
-  </select>
-  <button onclick="getExchangeUsingFetch();">Tipo de Cambio</button>
-  <h3>Results:</h3>
-  <div id="result"></div>
+  <!-- Hero Section -->
+  <section class="hero">
+    <h1>Sistema de Gestión Académica</h1>
+    <p>Administra cursos y profesores de forma fácil y eficiente</p>
+  </section>
+
+  <!-- Main Content -->
+  <div class="container">
+    <div class="cards">
+      <!-- Card Cursos -->
+      <div class="card">
+        <div class="card-icon">📚</div>
+        <h2>Cursos</h2>
+        <p>Gestiona el catálogo de cursos, incluyendo nombre, código, créditos y descripción.</p>
+        <div class="card-buttons">
+          <a href="create-course.html" class="btn btn-primary">Crear Curso</a>
+          <a href="list-courses.html" class="btn btn-secondary">Ver Todos</a>
+        </div>
+      </div>
+
+      <!-- Card Profesores -->
+      <div class="card">
+        <div class="card-icon">👨‍🏫</div>
+        <h2>Profesores</h2>
+        <p>Administra el personal docente con información completa de cada profesor.</p>
+        <div class="card-buttons">
+          <a href="create-profesor.html" class="btn btn-primary">Crear Profesor</a>
+          <a href="list-profesores.html" class="btn btn-secondary">Ver Todos</a>
+        </div>
+      </div>
+
+      <!-- Card Estadísticas -->
+      <div class="card">
+        <div class="card-icon">📊</div>
+        <h2>Estadísticas</h2>
+        <p>Visualiza estadísticas y reportes del sistema académico.</p>
+        <div class="card-buttons">
+          <a href="#" class="btn btn-secondary">Próximamente</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features Section -->
+  <section class="features">
+    <h2>Características</h2>
+    <p>Un sistema completo para la gestión académica</p>
+    <div class="feature-list">
+      <div class="feature-item">
+        <h3>✨ Fácil de Usar</h3>
+        <p>Interfaz intuitiva y amigable</p>
+      </div>
+      <div class="feature-item">
+        <h3>🚀 Rápido</h3>
+        <p>Operaciones en tiempo real</p>
+      </div>
+      <div class="feature-item">
+        <h3>🔒 Seguro</h3>
+        <p>Base de datos MongoDB segura</p>
+      </div>
+      <div class="feature-item">
+        <h3>📱 Responsive</h3>
+        <p>Funciona en todos los dispositivos</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2026 Universidad Técnica Nacional</p>
+    <p>Sistema de Gestión Académica - Workshop 3</p>
+  </footer>
 </body>
-
 </html>
