@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>List Profesores</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1200px;
+      margin: 50px auto;
+      padding: 20px;
+    }
+    nav {
+      margin-bottom: 20px;
+    }
+    nav a {
+      margin-right: 15px;
+      text-decoration: none;
+      color: #4CAF50;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+    }
+    th {
+      background-color: #4CAF50;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #loading {
+      text-align: center;
+      font-size: 18px;
+      color: #666;
+    }
+    #error {
+      background-color: #f8d7da;
+      color: #721c24;
+      padding: 10px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+    }
+    .empty {
+      text-align: center;
+      padding: 20px;
+      color: #666;
+    }
+    .btn-edit, .btn-delete, .btn-save, .btn-cancel {
+      padding: 5px 10px;
+      margin: 2px;
+      border: none;
+      cursor: pointer;
+      border-radius: 3px;
+      font-size: 14px;
+    }
+    .btn-edit {
+      background-color: #2196F3;
+      color: white;
+    }
+    .btn-delete {
+      background-color: #f44336;
+      color: white;
+    }
+    .btn-save {
+      background-color: #4CAF50;
+      color: white;
+    }
+    .btn-cancel {
+      background-color: #999;
+      color: white;
+    }
+    .btn-edit:hover { background-color: #0b7dda; }
+    .btn-delete:hover { background-color: #da190b; }
+    .btn-save:hover { background-color: #45a049; }
+    .btn-cancel:hover { background-color: #777; }
+    .edit-input {
+      width: 100%;
+      padding: 5px;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="create-course.html">Create Course</a>
+    <a href="list-courses.html">List Courses</a>
+    <a href="create-profesor.html">Create Profesor</a>
+    <a href="list-profesores.html">List Profesores</a>
+  </nav>
+
+  <h1>All Profesores</h1>
+  
+  <button onclick="loadProfesores()">Refresh Profesores</button>
+  
+  <div id="error" style="display: none;"></div>
+  <div id="loading" style="display: none;">Loading profesores...</div>
+  <div id="profesoresContainer"></div>
+
+  <script>
+    async function loadProfesores() {
+      const loadingDiv = document.getElementById('loading');
+      const errorDiv = document.getElementById('error');
+      const container = document.getElementById('profesoresContainer');
+      
+      loadingDiv.style.display = 'block';
+      errorDiv.style.display = 'none';
+      container.innerHTML = '';
+
+      try {
+        const response = await fetch('http://localhost:3001/professors');
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const profesores = await response.json();
+        loadingDiv.style.display = 'none';
+        
+        if (profesores.length === 0) {
+          container.innerHTML = '<div class="empty">No profesores found. Create your first profesor!</div>';
+          return;
+        }
+
+        const table = document.createElement('table');
+        table.innerHTML = `
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Surname</th>
+              <th>ID</th>
+              <th>Age</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${profesores.map(profesor => `
+              <tr id="row-${profesor._id}">
+                <td id="name-${profesor._id}">${profesor.name}</td>
+                <td id="surname-${profesor._id}">${profesor.surname}</td>
+                <td id="id-${profesor._id}">${profesor.id}</td>
+                <td id="age-${profesor._id}">${profesor.age}</td>
+                <td>
+                  <button class="btn-edit" onclick="editProfesor('${profesor._id}')">Edit</button>
+                  <button class="btn-delete" onclick="deleteProfesor('${profesor._id}')">Delete</button>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        `;
+        
+        container.appendChild(table);
+        
+      } catch (error) {
+        loadingDiv.style.display = 'none';
+        errorDiv.style.display = 'block';
+        errorDiv.innerHTML = `Error loading profesores: ${error.message}`;
+      }
+    }
+
+    function editProfesor(id) {
+      const nameCell = document.getElementById(`name-${id}`);
+      const surnameCell = document.getElementById(`surname-${id}`);
+      const idCell = document.getElementById(`id-${id}`);
+      const ageCell = document.getElementById(`age-${id}`);
+      const row = document.getElementById(`row-${id}`);
+      
+      const currentName = nameCell.textContent;
+      const currentSurname = surnameCell.textContent;
+      const currentId = idCell.textContent;
+      const currentAge = ageCell.textContent;
+      
+      nameCell.innerHTML = `<input type="text" class="edit-input" id="edit-name-${id}" value="${currentName}">`;
+      surnameCell.innerHTML = `<input type="text" class="edit-input" id="edit-surname-${id}" value="${currentSurname}">`;
+      idCell.innerHTML = `<input type="text" class="edit-input" id="edit-id-${id}" value="${currentId}">`;
+      ageCell.innerHTML = `<input type="number" class="edit-input" id="edit-age-${id}" value="${currentAge}">`;
+      
+      const actionsCell = row.cells[4];
+      actionsCell.innerHTML = `
+        <button class="btn-save" onclick="saveProfesor('${id}')">Save</button>
+        <button class="btn-cancel" onclick="loadProfesores()">Cancel</button>
+      `;
+    }
+
+    async function saveProfesor(id) {
+      const name = document.getElementById(`edit-name-${id}`).value;
+      const surname = document.getElementById(`edit-surname-${id}`).value;
+      const profesorId = document.getElementById(`edit-id-${id}`).value;
+      const age = parseInt(document.getElementById(`edit-age-${id}`).value);
+      
+      try {
+        const response = await fetch(`http://localhost:3001/professors?id=${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ name, surname, id: profesorId, age })
+        });
+        
+        if (response.ok) {
+          loadProfesores();
+        } else {
+          const error = await response.json();
+          alert(`Error updating profesor: ${error.message}`);
+        }
+      } catch (error) {
+        alert(`Error: ${error.message}`);
+      }
+    }
+
+    async function deleteProfesor(id) {
+      if (!confirm('Are you sure you want to delete this profesor?')) {
+        return;
+      }
+      
+      try {
+        const response = await fetch(`http://localhost:3001/professors?id=${id}`, {
+          method: 'DELETE'
+        });
+        
+        if (response.ok || response.status === 204) {
+          loadProfesores();
+        } else {
+          const error = await response.json();
+          alert(`Error deleting profesor: ${error.message}`);
+        }
+      } catch (error) {
+        alert(`Error: ${error.message}`);
+      }
+    }
+
+    // Load profesores when page loads
+    window.addEventListener('DOMContentLoaded', loadProfesores);
+  </script>
+</body>
+</html>
