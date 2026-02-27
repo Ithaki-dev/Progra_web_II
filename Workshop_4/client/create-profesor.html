@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Profesor</title>
+  <script src="auth-helper.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      border-radius: 4px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #message {
+      margin-top: 20px;
+      padding: 10px;
+      border-radius: 4px;
+      display: none;
+    }
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    nav {
+      margin-bottom: 20px;
+    }
+    nav a {
+      margin-right: 15px;
+      text-decoration: none;
+      color: #4CAF50;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="create-course.html">Create Course</a>
+    <a href="list-courses.html">List Courses</a>
+    <a href="create-profesor.html">Create Profesor</a>
+    <a href="list-profesores.html">List Profesores</a>
+  </nav>
+
+  <h1>Create New Profesor</h1>
+  
+  <form id="profesorForm">
+    <div class="form-group">
+      <label for="nombre">Nombre:</label>
+      <input type="text" id="nombre" name="nombre" required placeholder="e.g., Juan">
+    </div>
+    
+    <div class="form-group">
+      <label for="apellido">Apellido:</label>
+      <input type="text" id="apellido" name="apellido" required placeholder="e.g., Pérez">
+    </div>
+    
+    <div class="form-group">
+      <label for="id">ID:</label>
+      <input type="text" id="id" name="id" required placeholder="e.g., 123456789">
+    </div>
+    
+    <div class="form-group">
+      <label for="edad">Edad:</label>
+      <input type="number" id="edad" name="edad" min="18" max="100" required placeholder="e.g., 35">
+    </div>
+    
+    <button type="submit">Create Profesor</button>
+  </form>
+  
+  <div id="message"></div>
+
+  <script>
+    // Check authentication on page load
+    requireAuth();
+
+    document.getElementById('profesorForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const profesor = {
+        name: document.getElementById('nombre').value,
+        surname: document.getElementById('apellido').value,
+        id: document.getElementById('id').value,
+        age: parseInt(document.getElementById('edad').value)
+      };
+
+      const messageDiv = document.getElementById('message');
+      messageDiv.style.display = 'none';
+
+      try {
+        const response = await authenticatedFetch('http://localhost:3001/professors', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(profesor)
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          messageDiv.className = 'success';
+          messageDiv.style.display = 'block';
+          messageDiv.innerHTML = `✓ Profesor created successfully!<br>
+                                  <strong>Nombre:</strong> ${data.name}<br>
+                                  <strong>Apellido:</strong> ${data.surname}<br>
+                                  <strong>ID:</strong> ${data.id}<br>
+                                  <strong>Edad:</strong> ${data.age}`;
+          document.getElementById('profesorForm').reset();
+          
+          // Optionally redirect to list page after 2 seconds
+          setTimeout(() => {
+            if (confirm('Profesor created! Do you want to view all profesores?')) {
+              window.location.href = 'list-profesores.html';
+            }
+          }, 1500);
+        } else {
+          const error = await response.json();
+          messageDiv.className = 'error';
+          messageDiv.style.display = 'block';
+          messageDiv.innerHTML = `✗ Error: ${error.message || 'Failed to create profesor'}`;
+        }
+      } catch (error) {
+        messageDiv.className = 'error';
+        messageDiv.style.display = 'block';
+        messageDiv.innerHTML = `✗ Error: ${error.message}. Make sure the server is running on port 3001.`;
+      }
+    });
+  </script>
+</body>
+</html>
